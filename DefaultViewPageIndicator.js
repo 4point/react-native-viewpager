@@ -1,74 +1,28 @@
-'use strict';
-
-var React = require('react');
-var ReactNative = require('react-native');
-var PropTypes = require('prop-types');
-var createReactClass = require('create-react-class');
-var {
+import React from 'react';
+import {
   Dimensions,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
   Animated,
-} = ReactNative;
+} from 'react-native';
+import PropTypes from 'prop-types';
 
-var deviceWidth = Dimensions.get('window').width;
-var DOT_SIZE = 6;
-var DOT_SAPCE = 4;
+const DOT_SIZE = 8;
+const DOT_SAPCE = 4;
 
-var styles = StyleSheet.create({
-  tab: {
-    alignItems: 'center',
-  },
+export default class DefaultViewPageIndicator extends React.Component {
 
-  tabs: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  dot: {
-    width: DOT_SIZE,
-    height: DOT_SIZE,
-    borderRadius: DOT_SIZE / 2,
-    backgroundColor: '#E0E1E2',
-    marginLeft: DOT_SAPCE,
-    marginRight: DOT_SAPCE,
-  },
-
-  curDot: {
-    position: 'absolute',
-    width: DOT_SIZE,
-    height: DOT_SIZE,
-    borderRadius: DOT_SIZE / 2,
-    backgroundColor: '#80ACD0',
-    margin: DOT_SAPCE,
-    bottom: 0,
-  },
-});
-
-var DefaultViewPageIndicator = createReactClass({
-  propTypes: {
+  static propTypes = {
     goToPage: PropTypes.func,
     activePage: PropTypes.number,
     pageCount: PropTypes.number
-  },
+  };
 
-  getInitialState() {
-    return {
-      viewWidth: 0,
-    };
-  },
-
-  renderIndicator(page) {
-    //var isTabActive = this.props.activePage === page;
-    return (
-      <TouchableOpacity style={styles.tab} key={'idc_' + page} onPress={() => this.props.goToPage(page)}>
-        <View style={styles.dot} />
-      </TouchableOpacity>
-    );
-  },
+  state = {
+    viewWidth: 0
+  };
 
   render() {
     var pageCount = this.props.pageCount;
@@ -87,21 +41,67 @@ var DefaultViewPageIndicator = createReactClass({
     }
 
     return (
-      <View style={styles.tabs}
-        onLayout={(event) => {
-            var viewWidth = event.nativeEvent.layout.width;
-            if (!viewWidth || this.state.viewWidth === viewWidth) {
-              return;
-            }
-            this.setState({
-              viewWidth: viewWidth,
-            });
-          }}>
-        {indicators}
-        <Animated.View style={[styles.curDot, {left}]} />
+      <View style={styles.indicators}>
+        <View style={styles.tabs}
+              onLayout={(event) => {
+                var viewWidth = event.nativeEvent.layout.width;
+                if (!viewWidth || this.state.viewWidth === viewWidth) {
+                  return;
+                }
+                this.setState({viewWidth});
+              }}>
+          {indicators}
+          <Animated.View style={[styles.curDot, {left}]}/>
+        </View>
       </View>
     );
-  },
-});
+  }
 
-module.exports = DefaultViewPageIndicator;
+  renderIndicator(page) {
+    return (
+      <TouchableOpacity style={styles.tab} key={'idc_' + page} onPress={() => this.props.goToPage(page)}>
+        <View style={styles.dot}/>
+      </TouchableOpacity>
+    );
+  }
+
+}
+
+const styles = StyleSheet.create({
+  tab: {
+    alignItems: 'center',
+  },
+
+  tabs: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+
+  dot: {
+    width: DOT_SIZE,
+    height: DOT_SIZE,
+    borderRadius: DOT_SIZE / 2,
+    backgroundColor: '#ccc',
+    marginHorizontal: DOT_SAPCE
+  },
+
+  curDot: {
+    position: 'absolute',
+    width: DOT_SIZE,
+    height: DOT_SIZE,
+    borderRadius: DOT_SIZE / 2,
+    backgroundColor: '#666',
+    marginHorizontal: DOT_SAPCE
+  },
+
+  indicators: {
+    flex: 1,
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 10,
+    left: 0,
+    right: 0,
+    backgroundColor: 'transparent',
+  }
+});
